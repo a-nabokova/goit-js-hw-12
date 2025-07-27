@@ -3,7 +3,7 @@ import "izitoast/dist/css/iziToast.min.css";
 
 
 import { getImagesByQuery } from './js/pixabay-api'
-import {createGallery, clearGallery, showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, gallery } from './js/render-functions'
+import {createGallery, clearGallery, showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, disableLoadBtn, enableLoadBtn, gallery } from './js/render-functions'
 
 
 
@@ -21,7 +21,9 @@ let galleryCardHeight;
 form.addEventListener('submit', handleSubmit);
 
   async function handleSubmit(event) {
-   event.preventDefault(); 
+    event.preventDefault(); 
+        hideLoadMoreButton(loadBtn); 
+
    
    
    valueToShow = input.value.trim();
@@ -36,8 +38,12 @@ form.addEventListener('submit', handleSubmit);
         return;
     }  
 
-      clearGallery();
-      showLoader(loader);
+    page = 1;
+
+    clearGallery(gallery);
+    showLoader(loader);
+     
+    
 
     try {
       const data = await getImagesByQuery(valueToShow, page)
@@ -56,8 +62,14 @@ form.addEventListener('submit', handleSubmit);
        
 
       if (page * perPage < data.totalHits) {
-         showLoadMoreButton(loadBtn);
-       }
+  showLoadMoreButton(loadBtn);
+} else {
+  iziToast.show({
+    message: 'We are sorry, but you have reached the end of search results.',
+    color: 'blue',
+    position: 'topRight',
+  });
+}
       
     } catch(error) {
         iziToast.show({
@@ -76,18 +88,18 @@ loadBtn.addEventListener('click', onLoadBtn);
 
 async function onLoadBtn() {
   page++;
-  loadBtn.disabled = true; 
+  disableLoadBtn(loadBtn); 
 
   try {
 
     const data = await getImagesByQuery(valueToShow, page);
     createGallery(data.hits); 
-    if (page * perPage >= data.totalHits) {
+    if (data.hits.length === 0 || page * perPage >= data.totalHits) {
       hideLoadMoreButton(loadBtn);
       iziToast.show({
         message: 'We are sorry, but you have reached the end of search results.'
 })
-      page = 1; 
+      
     }
     
      const galleryCard = document.querySelector('.gallery-item');
@@ -107,7 +119,7 @@ async function onLoadBtn() {
     console.log(error);
 
   } finally {
-    loadBtn.disabled = false; 
+    enableLoadBtn(loadBtn); 
   }
    
 

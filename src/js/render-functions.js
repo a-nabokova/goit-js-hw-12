@@ -5,6 +5,7 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 // import { loadBtn } from '../main';
  
 export const gallery = document.querySelector('.gallery');
+ 
 
 
  const lightbox = new SimpleLightbox('.gallery a', {
@@ -71,3 +72,13 @@ export function showLoadMoreButton(loadBtn) {
 export function hideLoadMoreButton(loadBtn) {
   loadBtn.classList.add('hidden');
 }
+
+export function disableLoadBtn(loadBtn) {
+  loadBtn.disabled = true;
+}
+
+export function enableLoadBtn(loadBtn) {
+  loadBtn.disabled = false;
+}
+
+  
